@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test HLS Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+    <input type="text" id="streamInput" placeholder="Название директории" value="Киш">
+    <button onclick="updateStream()">Обновить</button>
+    <audio id="audio" controls></audio>
+    <script>
+        const audio = document.getElementById('audio');
+        function updateStream() {
+            const streamName = document.getElementById('streamInput').value.trim();
+            const streamUrl = `http://localhost:8004/stream/${encodeURIComponent(streamName)}/playlist.m3u8`;
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(streamUrl);
+                hls.attachMedia(audio);
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    console.error("Ошибка HLS:", data);
+                });
+            } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
+                audio.src = streamUrl;
+            } else {
+                alert("Ваш браузер не поддерживает HLS-аудио!");
+            }
+        }
+        updateStream();
+    </script>
+</body>
+</html>
